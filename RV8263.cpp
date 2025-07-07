@@ -65,7 +65,7 @@ esp_err_t RV8263::isOscillatorRunning(bool *oscillator_not_working) {
             return ret;
         }
 
-        vTaskDelay(pdMS_TO_TICKS(100));
+        vTaskDelay(pdMS_TO_TICKS(220));
 
         if (ret == ESP_OK) {
             // Try to clear all the register
@@ -75,7 +75,7 @@ esp_err_t RV8263::isOscillatorRunning(bool *oscillator_not_working) {
             ESP_LOGE(TAG, "Communication failed");
         }
 
-        vTaskDelay(pdMS_TO_TICKS(100));
+        vTaskDelay(pdMS_TO_TICKS(220));
     } while (esp_timer_get_time() < timeout && (ret != ESP_OK || *oscillator_not_working));
 
     if (ret == ESP_OK) {
