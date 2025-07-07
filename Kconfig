@@ -1,11 +1,15 @@
 menu "RTC"
 	menu "RV-8263-C7 RTC Driver"
-		config I2C_RV2863_0_ENABLED
-			bool "Enable I2C port 0"
-			default y
-		config I2C_RV2863_1_ENABLED
-			bool "Enable I2C port 1"
-			default n
+		choice
+			prompt "I2C port"
+			default I2C_RV2863_0_ENABLED
+
+			config I2C_RV2863_0_ENABLED
+				bool "Enable I2C port 0"
+			config I2C_RV2863_1_ENABLED
+				bool "Enable I2C port 1"
+		endchoice
+
 		config EPOCH_YEAR
 			int "EPOCH Year"
 			default 1900
