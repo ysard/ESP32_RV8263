@@ -47,6 +47,7 @@ RV8263::RV8263() {
 /**
  * @brief Test the clock integrity
  * If the oscillator is not working, a reset should be made.
+ * @note ~5 tests are made in the 2.5s allowed
  */
 esp_err_t RV8263::isOscillatorRunning(bool *oscillator_not_working) {
     esp_err_t ret;
@@ -651,7 +652,7 @@ long RV8263::getEpoch(void) {
     // Get UTC+x time
     struct tm t;
 
-    memset(&t, 0, sizeof(tm));                                                                     // Initialize to all 0's
+    memset(&t, 0, sizeof(tm));                                                                  // Initialize to all 0's
     t.tm_year = RV8263::bcdToInt(this->sttime.Year & FILTER_YEAR) + RTC_BIAS_YEAR - EPOCH_YEAR; // This is year-1900, so RTC store from 2000, not sure which epoch has to be used
     t.tm_mon  = RV8263::bcdToInt(this->sttime.Month & FILTER_MONTH) - EPOCH_BIAS_MONTH;         // According to https://en.cppreference.com/w/cpp/chrono/c/mktime subtract is required
     t.tm_mday = RV8263::bcdToInt(this->sttime.Date & FILTER_DATE);
