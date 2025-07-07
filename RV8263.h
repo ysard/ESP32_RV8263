@@ -211,6 +211,12 @@ public:
     RV8263(fncPntr readI2CFnc, fncPntrConst writeI2CFnc);
     RV8263();
 
+    /**
+     * @brief Test the clock integrity
+     * If the oscillator is not working, a reset should be made.
+     * @param oscillator_not_working True if the oscillator is not working
+     * @note ~5 tests are made in the 2.5s allowed
+     */
     esp_err_t isOscillatorRunning(bool *oscillator_not_working);
 
     esp_err_t readAllRegsFromRTC(void);
