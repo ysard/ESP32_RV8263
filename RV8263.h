@@ -219,17 +219,33 @@ public:
      */
     esp_err_t isOscillatorRunning(bool *oscillator_not_working);
 
+    /**
+     * @brief Sync the internal structure with the RTC chip
+     * @warning This function should be used right after the object initialization
+     */
     esp_err_t readAllRegsFromRTC(void);
     esp_err_t writeAllRegsToRTC(void);
     esp_err_t readControl1Reg(uint8_t *);
     esp_err_t writeControl1Reg(uint8_t);
+    /**
+     * @brief Reset all the registers of the RTC
+     * @note Can be required if Power On Reset process
+     *  ends up with corrupted registers, or if the oscillator
+     *  has stopped due to power supply instability.
+     */
     esp_err_t resetRTC(void);
     esp_err_t readControl2Reg(uint8_t *);
     esp_err_t writeControl2Reg(uint8_t);
     esp_err_t writeTimeToRTC(void);
     esp_err_t readTimeFromRTC(void);
 
+    /**
+     * @brief Get the UTC+tz epoch (with timezone)
+     */
     long getEpoch(void);
+    /**
+     * @brief Get the UTC epoch (without timezone)
+     */
     long getEpochUTC(void);
     void updateTimeFromEpoch(long, bool          = true);
     esp_err_t writeTimeFromEpochToRTC(long, bool = true);
