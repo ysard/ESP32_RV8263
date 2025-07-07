@@ -1,0 +1,20 @@
+menu "RTC"
+	menu "RV-8263-C7 RTC Driver"
+		config I2C_RV2863_0_ENABLED
+			bool "Enable I2C port 0"
+			default y
+		config I2C_RV2863_1_ENABLED
+			bool "Enable I2C port 1"
+			default n
+		config EPOCH_YEAR
+			int "EPOCH Year"
+			default 1900
+			help
+				The Year where the EPOCH started
+		config TIME_ZONE
+			int "Time Zone"
+			default 1
+			help
+				Adjust according to GMT
+	endmenu
+endmenu
