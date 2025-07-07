@@ -252,29 +252,114 @@ public:
     esp_err_t readHoursFromRTC(uint8_t *);
 
     /* Timers */
+    /**
+     * @brief Get the status of the TF flag associated to the MI, HMI, countdown counters
+     * @param bReturn True if the interrupt was triggered
+     * @param updateRequired Set to True to directly interrogate the chip
+     */
     esp_err_t isTimerWakeUp(bool *bReturn, bool updateRequired = true); // TF
+    /**
+     * @brief Clear the TF flag associated to the MI, HMI, countdown counters
+     */
     esp_err_t clearTimerWakeUp(); // TF
+    /**
+     * @brief Configure the output of countdown timer as an interrupt
+     * @param enable If True, the TIE flag is not set, the output will not be triggered.
+     */
     esp_err_t setCountdownInterrupt(bool enable = true); // TIE
-    // This will stop the TE countdown counter
+    /**
+     * @brief Configure the countdown counter
+     * @param value Configure the number of countdown periods (1-255)
+     * @param clock_freq Configure the countdown period duration (TD flag)
+     * @param pulsed If True, enable the pulse generator for this timer (TI_TP flag)
+     * @note This will stop the TE countdown counter to avoid a corruption of the counter.
+     */
 	esp_err_t configureCountdownCounter(uint8_t value, eTimeClockFreq clock_freq = MIN, uint8_t pulsed = false); // value, TD, TI_TP
-    // enable pulse generation timer countdown interrupts
+    /**
+     * @brief Enable pulse generation on MI, HMI, countdown interrupts
+     * Update the TI_TP flag.
+     * @param enable If True, when an interrupt is triggered, the counter
+     *  automatically re-loads and starts the next timer period.
+     *  If False, the timer is in one-shot mode.
+     */
 	esp_err_t setPulseGeneration(bool enable = true); // TI_TP
+    /**
+     * @brief Set the status of the countdown counter
+     * Update the TE flag.
+     */
     esp_err_t setCountdownCounter(bool enable = true); // TE
-    esp_err_t setMinuteCounter(bool enable = true); // MI check mode 0
-	esp_err_t setHalfMinuteCounter(bool enable = true); // HMI check mode 0
+    /**
+     * @brief Set the status of the Minute counter
+     * Update the MI flag.
+     * @note Can't be used with OFFSET Fast Mode.
+     */
+    esp_err_t setMinuteCounter(bool enable = true); // MI
+    /**
+     * @brief Set the status of the Half Minute counter
+     * Update the HMI flag.
+     * @note Can't be used with OFFSET Fast Mode.
+     */
+	esp_err_t setHalfMinuteCounter(bool enable = true); // HMI
     // updateRequired is false because we do not provide a function to modify this bit
 	esp_err_t isOffsetFastModeEnabled(bool *, bool = false);
+    /**
+     * @brief Set or unset a flag in the given register
+     * For internal use, only for CONTROL2 & TIMER_MODE registers.
+     */
     esp_err_t setBit(uint8_t reg_addr, uint8_t flag, bool enable);
+    /**
+     * @brief Get the timer value
+     */
 	esp_err_t readTimerValueFromRTC(uint8_t *);
+    /**
+     * @brief Set the timer value
+     * @see Prefer to use `configureCountdownCounter`
+     */
     esp_err_t writeTimerValueToRTC(uint8_t);
+    /**
+     * @brief Get the timer mode register
+     * For internal use, low level function.
+     * @see `configureCountdownCounter`, `setCountdownCounter`,
+     *  `setCountdownInterrupt`, `setPulseGeneration`
+     */
     esp_err_t readTimerModeFromRTC(uint8_t *);
+    /**
+     * @brief Set the timer mode register
+     * For internal use, low level function.
+     * @see `configureCountdownCounter`, `setCountdownCounter`,
+     *  `setCountdownInterrupt`, `setPulseGeneration`
+     */
     esp_err_t writeTimerModeToRTC(uint8_t);
 
+
     /* Alarms */
+    /**
+     * @brief Get the status of the AF flag associated to the alarms
+     * @param bReturn True if the interrupt was triggered
+     * @param updateRequired Set to True to directly interrogate the chip
+     */
 	esp_err_t isAlarmWakeUp(bool *, bool = true); // AF
+    /**
+     * @brief Clear the AF flag associated to the alarms
+     */
 	esp_err_t clearAlarmWakeUp(); // AF
+    /**
+     * @brief Configure the output of the alarms as an interrupt
+     * If the AIE flag is not set, the output will not be triggered.
+     */
     esp_err_t setAlarmInterrupt(bool enable = true); // AIE
+    /**
+     * @brief Configure any of the alarm registers
+     * @param reg_addr Choose FLAG_SECS_ALARM, FLAG_MINS_ALARM, FLAG_HOURS_ALARM,
+     *  FLAG_DATE_ALARM, FLAG_WDAY_ALARM
+     * @param enable If False, the alarm is disabled & it's value is reset
+     * @param value Set seconds, minutes, hours (24h), date, weekday values
+     * @note For now, hours can only be in 24h format
+     */
     esp_err_t configureAlarms(uint8_t reg_addr, bool enable, uint8_t value = 0);
+    /**
+     * @brief Reset & disable all the alarms
+     */
 	esp_err_t resetAlarms();
 
 
