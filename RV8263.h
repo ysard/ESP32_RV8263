@@ -35,7 +35,7 @@
 
 // Default from kconfig
 // #define CONFIG_EPOCH_YEAR    1900
-// #define CONFIG_TIME_ZONE     1
+// #define CONFIG_TIME_ZONE     CET-1CEST,M3.5.0,M10.5.0/3 (Europe/Paris)
 // #define I2C_MASTER_NUM       I2C_NUM_0
 
 // i2c Address
@@ -203,10 +203,11 @@ private:
 
     fncPntrConst _fp_writei2c = nullptr;
     fncPntr _fp_readi2c       = nullptr;
-    int8_t _timeZone          = TIME_ZONE;
-	// TODO add osc status bool
-    int8_t _dls   = 0;
-    _ttime sttime = {};
+    const char *timezone      = nullptr;
+    _ttime sttime             = {};
+
+
+    // TODO add osc status bool
 public:
     RV8263(fncPntr readI2CFnc, fncPntrConst writeI2CFnc);
     RV8263();
@@ -249,8 +250,18 @@ public:
      */
     esp_err_t writeTimeFromEpochToRTC(const time_t epoch);
 
-    // void setTimeZone(int8_t, bool = false);
-    // int8_t getTimeZone(void);
+    /**
+     * @brief Get the current timezone in POSIX format
+     * @see `setTimezone`
+     */
+    const char * getTimezone() const;
+
+    /**
+     * @brief Set the current timezone in POSIX format
+     * @see `getTimezone`
+     */
+    void setTimezone(const char *newTimezone);
+
 
     char *getFormattedDateTime(char *buffer, size_t len);
     char *getFormattedDateTime();

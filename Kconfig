@@ -16,9 +16,12 @@ menu "RTC"
 			help
 				The Year where the EPOCH started
 		config TIME_ZONE
-			int "Time Zone"
-			default 1
+			string "Enter a TZ-Variable (standardized POSIX string)"
+			default "CET-1CEST,M3.5.0,M10.5.0/3"
 			help
-				Adjust according to GMT
+				Used to update C library runtime data for the new time zone.
+				With this, localtime function will return correct local time,
+				taking time zone offset and daylight saving time into account.
+				Default is for Europe/Paris timezone.
 	endmenu
 endmenu

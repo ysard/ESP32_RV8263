@@ -35,12 +35,24 @@ static const char *TAG = "RV8263";
 RV8263::RV8263(fncPntr preadI2CFnc, fncPntrConst pwriteI2CFnc) {
     this->_fp_readi2c  = preadI2CFnc;
     this->_fp_writei2c = pwriteI2CFnc;
+    this->timezone = TIME_ZONE;
 }
 
 
 RV8263::RV8263() {
     this->_fp_readi2c  = &i2c_manager_read;
     this->_fp_writei2c = &i2c_manager_write;
+    this->timezone = TIME_ZONE;
+}
+
+
+const char* RV8263::getTimezone() const {
+    return this->timezone;
+}
+
+
+void RV8263::setTimezone(const char* newTimezone) {
+    this->timezone = newTimezone;
 }
 
 
@@ -672,7 +684,7 @@ time_t RV8263::getEpoch(void) {
     time_t epoch = mktime(&timeinfo);
 
     // Apply the current timezone
-    setenv("TZ", "/usr/share/zoneinfo/Europe/Paris", 1);
+    setenv("TZ", this->timezone, 1);
     tzset();
 
     if (_ESP_LOG_ENABLED(ESP_LOG_INFO)) {
@@ -711,7 +723,7 @@ esp_err_t RV8263::writeTimeFromEpochToRTC(const time_t epoch) {
     this->sttime.Seconds = RV8263::intToBCD(timeinfo.tm_sec);
 
     // Restore the current timezone
-    setenv("TZ", "Europe/Paris", 1);
+    setenv("TZ", this->timezone, 1);
     tzset();
 
     return this->writeTimeToRTC();
@@ -787,30 +799,6 @@ uint8_t RV8263::intToBCD(uint8_t num) {
 uint8_t RV8263::bcdToInt(uint8_t bcd) {
     // 0x10
     return ((bcd >> 4) * 10) + (bcd & 0x0f);
-}
-
-
-void RV8263::setTimeZone(int8_t timeZone, bool timeupdate) { // TODO: default true ? delete this param
-/*
- *      if(this->_timeZone != timeZone){
- *              // this->setToChanged();
- *      }*/
-
-    // in case of update requires the EPOCH shall be read out with the old TimeZone settings
-    // before re-calculated with the new TimeZone value.
-    if (timeupdate == true) {
-        long epoch;
-        epoch           = this->getEpochUTC();
-        this->_timeZone = timeZone;
-        this->writeTimeFromEpochToRTC(epoch);
-    } else {
-        this->_timeZone = timeZone;
-    }
-}
-
-
-int8_t RV8263::getTimeZone(void) {
-    return this->_timeZone;
 }
 
 
