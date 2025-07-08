@@ -206,8 +206,6 @@ private:
     const char *timezone      = nullptr;
     _ttime sttime             = {};
 
-
-    // TODO add osc status bool
 public:
     RV8263(fncPntr readI2CFnc, fncPntrConst writeI2CFnc);
     RV8263();
