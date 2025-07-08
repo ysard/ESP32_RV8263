@@ -155,50 +155,12 @@ esp_err_t RV8263::isAlarmWakeUp(bool *bReturn, bool updateRequired) {
 
 
 esp_err_t RV8263::clearTimerWakeUp() {
-    // esp_err_t ret;
-    //    uint8_t   reg = 0;
-    //
-    // ret = this->readControl2Reg(&reg);
-    // if (ret != ESP_OK) {
-    //  return ret;
-    // }
-    //
-    // // Clear the bit
-    // if (FLAG_CONTROL2_TF_CHECK(reg)) {
-    //  reg = FLAG_CONTROL2_TF_CLEAR(reg);
-    //  ret = this->writeControl2Reg(reg);
-    //  if (ret != ESP_OK) {
-    //      return ret;
-    //  }
-    //  this->sttime.Control2 = reg;
-    // }
-    // return ret;
-
     // Clear the bit
     return this->setBit(REG_ADDR_CONTROL2, FLAG_CONTROL2_TF, false);
 }
 
 
 esp_err_t RV8263::clearAlarmWakeUp() {
-    // esp_err_t ret;
-    //    uint8_t   reg = 0;
-    //
-    // ret = this->readControl2Reg(&reg);
-    // if (ret != ESP_OK) {
-    //  return ret;
-    // }
-    //
-    // // Clear the bit
-    // if (FLAG_CONTROL2_AF_CHECK(reg)) {
-    //  reg = FLAG_CONTROL2_AF_CLEAR(reg);
-    //  ret = this->writeControl2Reg(reg);
-    //  if (ret != ESP_OK) {
-    //      return ret;
-    //  }
-    //  this->sttime.Control2 = reg;
-    // }
-    // return ret;
-
     // Clear the bit
     return this->setBit(REG_ADDR_CONTROL2, FLAG_CONTROL2_AF, false);
 }
@@ -207,21 +169,6 @@ esp_err_t RV8263::clearAlarmWakeUp() {
 esp_err_t RV8263::setAlarmInterrupt(bool enable) { // AIE
     esp_err_t ret;
 
-    // uint8_t reg;
-
-    // TODO: use internal structure if we are certain that it is synchronized...
-    // ret = this->readControl2Reg(&reg);
-    // if (ret != ESP_OK) {
-    //  return ret;
-    // }
-    //
-    // if (enable)
-    //  reg |= FLAG_CONTROL2_AIE;
-    // else
-    //  reg = FLAG_CONTROL2_AIE_CLEAR(reg);
-    //
-    // ret = this->writeControl2Reg(reg);
-    // return ret;
     return this->setBit(REG_ADDR_CONTROL2, FLAG_CONTROL2_AIE, enable);
 }
 
@@ -229,21 +176,6 @@ esp_err_t RV8263::setAlarmInterrupt(bool enable) { // AIE
 esp_err_t RV8263::setCountdownInterrupt(bool enable) { // TIE
     esp_err_t ret;
 
-    // uint8_t reg;
-
-    // TODO: use internal structure if we are certain that it is synchronized...
-    // ret = this->readTimerModeFromRTC(&reg);
-    // if (ret != ESP_OK) {
-    //  return ret;
-    // }
-    //
-    // if (enable)
-    //  reg |= FLAG_TIMER_MODE_TIE;
-    // else
-    //  reg = FLAG_TIMER_MODE_TIE_CLEAR(reg);
-    //
-    // ret = this->writeTimerModeToRTC(reg);
-    // return ret;
     return this->setBit(REG_ADDR_TIMER_MODE, FLAG_TIMER_MODE_TIE, enable);
 }
 
@@ -341,21 +273,6 @@ esp_err_t RV8263::resetAlarms() {
 esp_err_t RV8263::setCountdownCounter(bool enable) {
     esp_err_t ret;
 
-    // uint8_t reg;
-
-    // TODO: use internal structure if we are certain that it is synchronized...
-    // ret = this->readTimerModeFromRTC(&reg);
-    // if (ret != ESP_OK) {
-    //  return ret;
-    // }
-    //
-    // if (enable)
-    //  reg |= FLAG_TIMER_MODE_TE;
-    // else
-    //  reg = FLAG_TIMER_MODE_TE_CLEAR(reg);
-    //
-    // ret = this->writeTimerModeToRTC(reg);
-    // return ret;
     return this->setBit(REG_ADDR_TIMER_MODE, FLAG_TIMER_MODE_TE, enable);
 }
 
@@ -363,21 +280,6 @@ esp_err_t RV8263::setCountdownCounter(bool enable) {
 esp_err_t RV8263::setPulseGeneration(bool enable) {
     esp_err_t ret;
 
-    // uint8_t reg;
-
-    // TODO: use internal structure if we are certain that it is synchronized...
-    // ret = this->readTimerModeFromRTC(&reg);
-    // if (ret != ESP_OK) {
-    //  return ret;
-    // }
-    //
-    // if (enable)
-    //  reg |= FLAG_TIMER_MODE_TI_TP;
-    // else
-    //  reg = FLAG_TIMER_MODE_TI_TP_CLEAR(reg);
-    //
-    // ret = this->writeTimerModeToRTC(reg);
-    // return ret;
     return this->setBit(REG_ADDR_TIMER_MODE, FLAG_TIMER_MODE_TI_TP, enable);
 }
 
@@ -396,19 +298,6 @@ esp_err_t RV8263::setMinuteCounter(bool enable) { // MI check mode 0
         return ret;
     }
 
-    // TODO: use internal structure if we are certain that it is synchronized...
-    // ret = this->readControl2Reg(&reg);
-    // if (ret != ESP_OK) {
-    //  return ret;
-    // }
-    //
-    // if (enable)
-    //  reg |= FLAG_CONTROL2_MI;
-    // else
-    //  reg = FLAG_CONTROL2_MI_CLEAR(reg);
-    //
-    // ret = this->writeControl2Reg(reg);
-    // return ret;
     return this->setBit(REG_ADDR_CONTROL2, FLAG_CONTROL2_MI, enable);
 }
 
@@ -427,22 +316,6 @@ esp_err_t RV8263::setHalfMinuteCounter(bool enable) { // HMI check mode 0
         return ret;
     }
 
-    // TODO: use internal structure if we are certain that it is synchronized...
-
-    /*
-     * ret = this->readControl2Reg(&reg);
-     * if (ret != ESP_OK) {
-     *      return ret;
-     * }
-     *
-     * if (enable)
-     *      reg |= FLAG_CONTROL2_HMI;
-     * else
-     *      reg = FLAG_CONTROL2_HMI_CLEAR(reg);
-     *
-     * ret = this->writeControl2Reg(reg);
-     * return ret;
-     */
     return this->setBit(REG_ADDR_CONTROL2, FLAG_CONTROL2_HMI, enable);
 }
 
