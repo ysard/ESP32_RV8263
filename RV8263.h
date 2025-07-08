@@ -215,7 +215,7 @@ public:
     /**
      * @brief Test the clock integrity
      * If the oscillator is not working, a reset should be made.
-     * @param oscillator_not_working True if the oscillator is not working
+     * @param[out] oscillator_not_working True if the oscillator is not working
      * @note ~5 tests are made in the 2.5s allowed
      */
     esp_err_t isOscillatorRunning(bool *oscillator_not_working);
@@ -246,7 +246,8 @@ public:
     time_t getEpoch(void);
 
     /**
-     * @brief Set the time from an UNIX timestamp
+     * @brief Set the time to the RTC
+     * @param[in] epoch UNIX timestamp
      * @see `getEpoch`
      */
     esp_err_t writeTimeFromEpochToRTC(const time_t epoch);
@@ -259,6 +260,7 @@ public:
 
     /**
      * @brief Set the current timezone in POSIX format
+     * @param[in] newTimezone Timezone in POSIX format
      * @see `getTimezone`
      */
     void setTimezone(const char *newTimezone);
@@ -296,8 +298,8 @@ public:
 
     /**
      * @brief Get the status of the TF flag associated to the MI, HMI, countdown counters
-     * @param bReturn True if the interrupt was triggered
-     * @param updateRequired Set to True to directly interrogate the chip
+     * @param[out] bReturn        True if the interrupt was triggered
+     * @param[in]  updateRequired Set to True to directly interrogate the chip
      */
     esp_err_t isTimerWakeUp(bool *bReturn, bool updateRequired = true); // TF
 
@@ -314,9 +316,9 @@ public:
 
     /**
      * @brief Configure the countdown counter
-     * @param value Configure the number of countdown periods (1-255)
+     * @param value      Configure the number of countdown periods (1-255)
      * @param clock_freq Configure the countdown period duration (TD flag)
-     * @param pulsed If True, enable the pulse generator for this timer (TI_TP flag)
+     * @param pulsed     If True, enable the pulse generator for this timer (TI_TP flag)
      * @note This will stop the TE countdown counter to avoid a corruption of the counter.
      */
     esp_err_t configureCountdownCounter(uint8_t value, eTimeClockFreq clock_freq = MIN, uint8_t pulsed = false); // value, TD, TI_TP
@@ -391,10 +393,10 @@ public:
 
     /**
      * @brief Get the status of the AF flag associated to the alarms
-     * @param bReturn True if the interrupt was triggered
-     * @param updateRequired Set to True to directly interrogate the chip
+     * @param[out] bReturn        True if the interrupt was triggered
+     * @param[in]  updateRequired Set to True to directly interrogate the chip
      */
-    esp_err_t isAlarmWakeUp(bool *, bool = true); // AF
+    esp_err_t isAlarmWakeUp(bool *bReturn, bool updateRequired = true); // AF
 
     /**
      * @brief Clear the AF flag associated to the alarms
@@ -411,8 +413,8 @@ public:
      * @brief Configure any of the alarm registers
      * @param reg_addr Choose FLAG_SECS_ALARM, FLAG_MINS_ALARM, FLAG_HOURS_ALARM,
      *  FLAG_DATE_ALARM, FLAG_WDAY_ALARM
-     * @param enable If False, the alarm is disabled & it's value is reset
-     * @param value Set seconds, minutes, hours (24h), date, weekday values
+     * @param enable   If False, the alarm is disabled & it's value is reset
+     * @param value    Set seconds, minutes, hours (24h), date, weekday values
      * @note For now, hours can only be in 24h format
      */
     esp_err_t configureAlarms(uint8_t reg_addr, bool enable, uint8_t value = 0);
