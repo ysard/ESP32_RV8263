@@ -77,12 +77,10 @@ esp_err_t configure_rtc_first_boot(unsigned long epoch) {
         return ret;
     }
 
-    rtc->writeTimeFromEpochToRTC(epoch);
+    ret = rtc->writeTimeFromEpochToRTC(epoch);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Failed to write epoch to RTC");
-        return ret;
     }
-
     return ret;
 }
 
