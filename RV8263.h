@@ -226,6 +226,7 @@ public:
      */
     esp_err_t readAllRegsFromRTC(void);
     esp_err_t writeAllRegsToRTC(void);
+
     /**
      * @brief Reset all the registers of the RTC
      * @note Can be required if Power On Reset process
@@ -421,11 +422,13 @@ public:
     esp_err_t writeControl1Reg(uint8_t);
     esp_err_t readControl2Reg(uint8_t *);
     esp_err_t writeControl2Reg(uint8_t);
+
     /**
      * @brief Fill the internal time structure with the RTC time related data
      *  Equivalent to a synchronisation.
      */
     esp_err_t readTimeFromRTC(void);
+
     /**
      * @brief Synchronize the RTC time related registers with the internal time structure
      */
