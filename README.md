@@ -77,17 +77,12 @@ esp_err_t configure_rtc_first_boot(unsigned long epoch) {
         return ret;
     }
 
-    rtc->writeTimeFromEpochToRTC(epoch, true);
+    rtc->writeTimeFromEpochToRTC(epoch);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Failed to write epoch to RTC");
         return ret;
     }
 
-    // Force DayLight Saving calculation
-    rtc->autoDLSUpdate();
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to update time with DLS config");
-    }
     return ret;
 }
 
@@ -100,12 +95,14 @@ extern "C" void app_main() {
     init_rtc();
     // Do not forget to test RTC before use, if not working: try a reset.
     configure_rtc_first_boot(epoch);
+    // Set a timezone which was not selected at compilation time
+    // Ex: Europe/London
+    rtc->setTimezone("GMT0BST,M3.5.0/1,M10.5.0");
+
     char *date_str = rtc->getFormattedDateTime();
     ESP_LOGI(TAG, "Date str from epoch: %s", date_str);
-    // Get the UTC+0
-    ESP_LOGI(TAG, "UTC+0 epoch: %lu", rtc->getEpochUTC());
-    // Get the UTC+2, timezone & DLS included
-    ESP_LOGI(TAG, "UTC+2 epoch: %lu", rtc->getEpoch());
+    // Get the UTC timestamp
+    ESP_LOGI(TAG, "UTC epoch: %lu", rtc->getEpoch());
 
     // Wake up every 1st day of month at midday
     rtc->resetAlarms();
