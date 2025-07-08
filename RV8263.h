@@ -263,9 +263,19 @@ public:
      */
     void setTimezone(const char *newTimezone);
 
+    /**
+     * @brief Get a formatted date
+     * @param[in]  formatter Date formatter used by `strftime`
+     * @param[out] buffer    Buffer in which the date string will be writen
+     * @param[in]  len       Size of the given buffer
+     * @return ESP_ERR_NO_MEM if the buffer was too small
+     */
+    esp_err_t getFormattedDateTime(const char *formatter, char *buffer, size_t len);
 
-    char *getFormattedDateTime(char *buffer, size_t len);
-    char *getFormattedDateTime();
+    /**
+     * @brief Get the date in the YYYYMMDD_HHMMSS format
+     */
+    char * getFormattedDateTime();
 
     bool isInDLSTime(int day, int month, int dow);
 

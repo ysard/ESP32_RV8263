@@ -675,26 +675,23 @@ uint8_t RV8263::bcdToInt(uint8_t bcd) {
 }
 
 
-// Returns the date in the YYYYMMDD_HHMMSS format.
-char * RV8263::getFormattedDateTime(char *buffer, size_t len) {
-    snprintf(
-        buffer, len, "%04d%02d%02d_%02d%02d%02d",
-        RV8263::bcdToInt(this->sttime.Year & FILTER_YEAR) + RTC_BIAS_YEAR,
-        RV8263::bcdToInt(this->sttime.Month & FILTER_MONTH),
-        RV8263::bcdToInt(this->sttime.Date & FILTER_DATE),
-        RV8263::bcdToInt(this->sttime.Hours & FILTER_HOURS),
-        RV8263::bcdToInt(this->sttime.Minutes & FILTER_MINS),
-        RV8263::bcdToInt(this->sttime.Seconds & FILTER_SECS)
-        );
-    return buffer;
+esp_err_t RV8263::getFormattedDateTime(const char *formatter, char *buffer, size_t len) {
+    time_t epoch = this->getEpoch();
+    struct tm timeinfo = *localtime(&epoch);
+
+    if (strftime(buffer, len, formatter, &timeinfo) == 0) {
+        ESP_LOGE(TAG, "Insufficient buffer size allocation");
+        return ESP_ERR_NO_MEM;
+    }
+    return ESP_OK;
 }
 
 
-// Returns the date in the YYYYMMDD_HHMMSS format.
 char * RV8263::getFormattedDateTime() {
-    static char date[16]; // Max of YYYYMMDD_HHMMSS with \0 terminator
+    static char buffer[16]; // Max of YYYYMMDD_HHMMSS with \0 terminator
 
-    return getFormattedDateTime(date, sizeof(date));
+    this->getFormattedDateTime("%Y%m%d_%H%M%S", buffer, sizeof(buffer));
+    return buffer;
 }
 
 
