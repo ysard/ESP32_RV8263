@@ -1,4 +1,8 @@
+# RV-8263-C7 driver for ESP32
+
 An ESP-IDF/PlatformIO library for the real time clock RV-8263-C7.
+
+This library is based on the work of [Istvan Zilizi](https://github.com/zilizii/RTC_MS/).
 
 The RV-8263-C7 is a CMOS real-time clock/calendar module optimized for low power consumption.
 This ultra small RTC module has been specially designed for miniature and cost sensitive applications.
