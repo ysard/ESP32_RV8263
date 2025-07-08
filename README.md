@@ -98,11 +98,17 @@ extern "C" void app_main() {
     // Set a timezone which was not selected at compilation time
     // Ex: Europe/London
     rtc->setTimezone("GMT0BST,M3.5.0/1,M10.5.0");
-
-    char *date_str = rtc->getFormattedDateTime();
-    ESP_LOGI(TAG, "Date str from epoch: %s", date_str);
     // Get the UTC timestamp
     ESP_LOGI(TAG, "UTC epoch: %lu", rtc->getEpoch());
+
+    // Get date in YYYYMMDD_HHMMSS format
+    char *datetime_str = rtc->getFormattedDateTime();
+    ESP_LOGI(TAG, "Date str from epoch: %s", datetime_str);
+
+    // Get date in YYYYMMDD format
+    char date[9]; // Do not forget '\0' terminator
+    rtc->getFormattedDateTime("%Y%m%d", date, sizeof(date));
+    ESP_LOGI(TAG, "Date str from epoch: %s", date);
 
     // Wake up every 1st day of month at midday
     rtc->resetAlarms();
