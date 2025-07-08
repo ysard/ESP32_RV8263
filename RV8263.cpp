@@ -648,51 +648,73 @@ esp_err_t RV8263::readHoursFromRTC(uint8_t *phours) {
 }
 
 
-long RV8263::getEpoch(void) {
-    // Get UTC+x time
-    struct tm t;
+time_t RV8263::getEpoch(void) {
+    struct tm timeinfo;
 
-    memset(&t, 0, sizeof(tm));                                                                  // Initialize to all 0's
-    t.tm_year = RV8263::bcdToInt(this->sttime.Year & FILTER_YEAR) + RTC_BIAS_YEAR - EPOCH_YEAR; // This is year-1900, so RTC store from 2000, not sure which epoch has to be used
-    t.tm_mon  = RV8263::bcdToInt(this->sttime.Month & FILTER_MONTH) - EPOCH_BIAS_MONTH;         // According to https://en.cppreference.com/w/cpp/chrono/c/mktime subtract is required
-    t.tm_mday = RV8263::bcdToInt(this->sttime.Date & FILTER_DATE);
-    t.tm_hour = RV8263::bcdToInt(this->sttime.Hours & FILTER_HOURS);
-    t.tm_min  = RV8263::bcdToInt(this->sttime.Minutes & FILTER_MINS);
-    t.tm_sec  = RV8263::bcdToInt(this->sttime.Seconds & FILTER_SECS);
+    // Get UTC time from the chip
+    setenv("TZ", "GMT0", 1);
+    tzset();
 
-    return mktime(&t);
-}
+    // This is year-1900, so RTC store from 2000
+    // According to https://en.cppreference.com/w/cpp/chrono/c/mktime subtract is required
+    // Note: tm_year stores 125 for 2025, we need 25
+    // So... 125 = 25 + 2000 - 1900
+    timeinfo.tm_year = RV8263::bcdToInt(this->sttime.Year & FILTER_YEAR) + RTC_BIAS_YEAR - EPOCH_YEAR;
+    timeinfo.tm_mon  = RV8263::bcdToInt(this->sttime.Month & FILTER_MONTH) - EPOCH_BIAS_MONTH;
+    timeinfo.tm_mday = RV8263::bcdToInt(this->sttime.Date & FILTER_DATE);
+    timeinfo.tm_hour = RV8263::bcdToInt(this->sttime.Hours & FILTER_HOURS);
+    timeinfo.tm_min  = RV8263::bcdToInt(this->sttime.Minutes & FILTER_MINS);
+    timeinfo.tm_sec  = RV8263::bcdToInt(this->sttime.Seconds & FILTER_SECS);
+    // Disable DST, assume local time is UTC+0 without DST
+    // DST will be set during the timezone conversion in another function
+    timeinfo.tm_isdst = -1;
 
+    time_t epoch = mktime(&timeinfo);
 
-long RV8263::getEpochUTC(void) {
-    // Subtract the UTC timezone => get the UTC+0 time
-    return(RV8263::getEpoch() - ((long)(this->_timeZone) * HOURS_SECS));
-}
+    // Apply the current timezone
+    setenv("TZ", "/usr/share/zoneinfo/Europe/Paris", 1);
+    tzset();
 
-
-void RV8263::updateTimeFromEpoch(long epoch, bool timeZoneUpdateReq) {
-    struct tm *tm;
-    long long e = epoch;
-
-    if (timeZoneUpdateReq) {
-        // Add timezone: compute the UTC+x time
-        e += ((long)this->_timeZone * HOURS_SECS);
+    if (_ESP_LOG_ENABLED(ESP_LOG_INFO)) {
+        char strftime_buf[64];
+        timeinfo = *localtime(&epoch);
+        strftime(strftime_buf, sizeof(strftime_buf), "%c %Z", &timeinfo);
+        ESP_LOGI(TAG, "Get UTC time: %s", strftime_buf);
     }
-    tm = gmtime(&e);
-    //cout <<" This is: Y:"<< tm->tm_year <<"- M:"<< tm->tm_mon + EPOCH_BIAS_MONTH<<"- D: "<<tm->tm_mday<<" T "<<tm->tm_hour + TIME_ZONE <<"-"<<tm->tm_min<<"-"<<tm->tm_sec<<endl;
-    this->sttime.Year    = RV8263::intToBCD(tm->tm_year + EPOCH_YEAR - RTC_BIAS_YEAR);
-    this->sttime.Month   = RV8263::intToBCD(tm->tm_mon + EPOCH_BIAS_MONTH);
-    this->sttime.Weekday = RV8263::intToBCD(tm->tm_wday);
-    this->sttime.Date    = RV8263::intToBCD(tm->tm_mday);
-    this->sttime.Hours   = RV8263::intToBCD(tm->tm_hour);
-    this->sttime.Minutes = RV8263::intToBCD(tm->tm_min);
-    this->sttime.Seconds = RV8263::intToBCD(tm->tm_sec);
+    return epoch;
 }
 
 
-esp_err_t RV8263::writeTimeFromEpochToRTC(long epoch, bool timeZoneUpdateReq) {
-    RV8263::updateTimeFromEpoch(epoch, timeZoneUpdateReq);
-    return RV8263::writeTimeToRTC();
+esp_err_t RV8263::writeTimeFromEpochToRTC(const time_t epoch) {
+    struct tm timeinfo;
+
+    // Set UTC time for the chip
+    setenv("TZ", "GMT0", 1);
+    tzset();
+
+    timeinfo = *localtime(&epoch);
+
+    if (_ESP_LOG_ENABLED(ESP_LOG_INFO)) {
+        char strftime_buf[64];
+        strftime(strftime_buf, sizeof(strftime_buf), "%c %Z", &timeinfo);
+        ESP_LOGI(TAG, "Get UTC time: %s", strftime_buf);
+    }
+
+    // Note: tm_year stores 125 for 2025, we need 25
+    // So... 125 + 1900 - 2000 = 25
+    this->sttime.Year    = RV8263::intToBCD(timeinfo.tm_year + EPOCH_YEAR - RTC_BIAS_YEAR);
+    this->sttime.Month   = RV8263::intToBCD(timeinfo.tm_mon + EPOCH_BIAS_MONTH);
+    this->sttime.Weekday = RV8263::intToBCD(timeinfo.tm_wday);
+    this->sttime.Date    = RV8263::intToBCD(timeinfo.tm_mday);
+    this->sttime.Hours   = RV8263::intToBCD(timeinfo.tm_hour);
+    this->sttime.Minutes = RV8263::intToBCD(timeinfo.tm_min);
+    this->sttime.Seconds = RV8263::intToBCD(timeinfo.tm_sec);
+
+    // Restore the current timezone
+    setenv("TZ", "Europe/Paris", 1);
+    tzset();
+
+    return this->writeTimeToRTC();
 }
 
 
@@ -812,97 +834,6 @@ char * RV8263::getFormattedDateTime() {
     static char date[16]; // Max of YYYYMMDD_HHMMSS with \0 terminator
 
     return getFormattedDateTime(date, sizeof(date));
-}
-
-
-void RV8263::resetDLS(void) {
-    this->_dls = 0;
-}
-
-
-esp_err_t RV8263::autoDLSUpdate() {
-    esp_err_t ret;
-
-    // get up to date time data from RTC
-    ret = this->readAllRegsFromRTC();
-    if (ret != ESP_OK) {
-        return ret;
-    }
-
-    struct tm *l;
-    long long epoch;
-    int8_t    l_dsl;
-    // get UTC+x (with tz)
-    epoch = getEpoch();
-    l     = gmtime(&epoch);
-
-    ESP_LOGD(TAG, "l->tm_mday, l->tm_mon, l->tm_wday: %d %d %d", l->tm_mday, l->tm_mon + EPOCH_BIAS_MONTH, l->tm_wday);
-    // 1 if summer time (+1)
-    // 0 if winter time (-1)
-    l_dsl = (int8_t)isInDLSTime(l->tm_mday, l->tm_mon + EPOCH_BIAS_MONTH, l->tm_wday);
-    ESP_LOGD(TAG, "DLS computed: %d; Stored DLS: %d", unsigned(l_dsl), unsigned(this->_dls));
-
-    if (l_dsl != this->_dls) {
-        //If the DLS changed in a Sunday --> hopefully the day of the DSL changes, check the time is over,
-        // other wise change can happen immediately
-        //if(      ( (l->tm_wday == 0) && ((l->tm_hour >= 3) && (l->tm_mon + EPOCH_BIAS_MONTH)==10 ) || (l->tm_hour >= 2 && (l->tm_mon + EPOCH_BIAS_MONTH)==3 )) || (l->tm_wday > 0))
-        // Not sunday
-        // Sunday:
-        //  >= 3h am, october
-        //	>= 2h am, march
-        if ((l->tm_wday > 0) || ((l->tm_wday == 0) && ((l->tm_hour >= 3) && (((l->tm_mon + EPOCH_BIAS_MONTH) == 10) || (((l->tm_hour >= 2) && ((l->tm_mon + EPOCH_BIAS_MONTH) == 3))))))) {
-            // this->setToChanged();
-            this->_dls = l_dsl;
-            // Subtract 1 hour if winter time
-            // Add 1 hour if summer time
-            if (l_dsl == 0) {
-                l_dsl = -1;
-            }
-            epoch += l_dsl * HOURS_SECS;
-            // Do not add tz since it is already in the epoch
-            writeTimeFromEpochToRTC(epoch, false);
-        } else {
-            ESP_LOGD(TAG, "No action until time ...");
-        }
-    }
-    return ret;
-}
-
-
-esp_err_t RV8263::forceDLSUpdate(void) {
-    esp_err_t ret;
-
-    // get up to date time data from RTC
-    ret = this->readAllRegsFromRTC();
-    if (ret != ESP_OK) {
-        return ret;
-    }
-
-    struct tm *l;
-    long long epoch;
-    int8_t    l_dsl;
-    // get UTC+x (with tz)
-    epoch = getEpoch();
-    l     = gmtime(&epoch);
-
-    resetDLS();
-
-    ESP_LOGD(TAG, "l->tm_mday, l->tm_mon, l->tm_wday: %d %d %d", l->tm_mday, l->tm_mon + EPOCH_BIAS_MONTH, l->tm_wday);
-    // 1 if summer time (+1)
-    // 0 if winter time (-1)
-    l_dsl = (int8_t)isInDLSTime(l->tm_mday, l->tm_mon + EPOCH_BIAS_MONTH, l->tm_wday);
-    ESP_LOGD(TAG, "DLS computed: %d; Stored DLS: %d", unsigned(l_dsl), unsigned(this->_dls));
-
-    // this->setToChanged();
-    this->_dls = l_dsl;
-    // Subtract 1 hour if winter time
-    // Add 1 hour if summer time
-    if (l_dsl == 0) {
-        l_dsl = -1;
-    }
-    epoch = epoch + l_dsl * HOURS_SECS;
-    writeTimeFromEpochToRTC(epoch, false);
-    return ret;
 }
 
 

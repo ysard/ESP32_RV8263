@@ -240,25 +240,27 @@ public:
     esp_err_t readTimeFromRTC(void);
 
     /**
-     * @brief Get the UTC+tz epoch (with timezone)
+     * @brief Get the UNIX timestamp
+     * @warning The local time displayed is an offset of the display
+     *  and not an offset of the Unix time on the Unix machine.
+     *  Thus the timestamp IS NOT and SHOULD NOT be influenced by
+     *  any timezone.
      */
-    long getEpoch(void);
+    time_t getEpoch(void);
+
     /**
-     * @brief Get the UTC epoch (without timezone)
+     * @brief Set the time from an UNIX timestamp
+     * @see `getEpoch`
      */
-    long getEpochUTC(void);
-    void updateTimeFromEpoch(long, bool          = true);
-    esp_err_t writeTimeFromEpochToRTC(long, bool = true);
-    void setTimeZone(int8_t, bool = false);
-    int8_t getTimeZone(void);
+    esp_err_t writeTimeFromEpochToRTC(const time_t epoch);
+
+    // void setTimeZone(int8_t, bool = false);
+    // int8_t getTimeZone(void);
 
     char *getFormattedDateTime(char *buffer, size_t len);
     char *getFormattedDateTime();
 
-    void resetDLS(void);
-    esp_err_t autoDLSUpdate();
     bool isInDLSTime(int day, int month, int dow);
-    esp_err_t forceDLSUpdate(void);
 
     esp_err_t writeYearToRTC(uint16_t);
     esp_err_t readYearFromRTC(uint16_t *);
