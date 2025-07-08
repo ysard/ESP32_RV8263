@@ -225,8 +225,6 @@ public:
      */
     esp_err_t readAllRegsFromRTC(void);
     esp_err_t writeAllRegsToRTC(void);
-    esp_err_t readControl1Reg(uint8_t *);
-    esp_err_t writeControl1Reg(uint8_t);
     /**
      * @brief Reset all the registers of the RTC
      * @note Can be required if Power On Reset process
@@ -234,10 +232,7 @@ public:
      *  has stopped due to power supply instability.
      */
     esp_err_t resetRTC(void);
-    esp_err_t readControl2Reg(uint8_t *);
-    esp_err_t writeControl2Reg(uint8_t);
-    esp_err_t writeTimeToRTC(void);
-    esp_err_t readTimeFromRTC(void);
+
 
     /**
      * @brief Get the UNIX timestamp
@@ -409,6 +404,22 @@ public:
     // RAM byte implementation
     esp_err_t readRAMFromRTC(uint8_t *);
     esp_err_t writeRAMToRTC(uint8_t);
+
+    // Low level functions
+    esp_err_t readControl1Reg(uint8_t *);
+    esp_err_t writeControl1Reg(uint8_t);
+    esp_err_t readControl2Reg(uint8_t *);
+    esp_err_t writeControl2Reg(uint8_t);
+    /**
+     * @brief Fill the internal time structure with the RTC time related data
+     *  Equivalent to a synchronisation.
+     */
+    esp_err_t readTimeFromRTC(void);
+    /**
+     * @brief Synchronize the RTC time related registers with the internal time structure
+     */
+    esp_err_t writeTimeToRTC(void);
+
 
     // Testing purpose functions
     esp_err_t printAllRegs(bool);
