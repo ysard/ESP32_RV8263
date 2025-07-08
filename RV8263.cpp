@@ -664,7 +664,7 @@ time_t RV8263::getEpoch(void) {
     struct tm timeinfo;
 
     // Get UTC time from the chip
-    setenv("TZ", "GMT0", 1);
+    setenv("TZ", "UTC0", 1);
     tzset();
 
     // This is year-1900, so RTC store from 2000
@@ -701,7 +701,7 @@ esp_err_t RV8263::writeTimeFromEpochToRTC(const time_t epoch) {
     struct tm timeinfo;
 
     // Set UTC time for the chip
-    setenv("TZ", "GMT0", 1);
+    setenv("TZ", "UTC0", 1);
     tzset();
 
     timeinfo = *localtime(&epoch);
