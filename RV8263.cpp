@@ -695,10 +695,6 @@ char * RV8263::getFormattedDateTime() {
 }
 
 
-/**
- * @brief Check if the date is concerned by the daylight saving time
- * Return true if it's summer time.
- */
 bool RV8263::isInDLSTime(int day, int month, int dow) {
     if ((month < 3) || (month > 10)) {
         return false;
@@ -718,4 +714,12 @@ bool RV8263::isInDLSTime(int day, int month, int dow) {
 
     ESP_LOGE(TAG, "has reached an unexpected place!");
     return false;     // this line never gonna happen
+}
+
+
+bool RV8263::isInDLSTime() {
+    time_t epoch = this->getEpoch();
+    struct tm timeinfo = *localtime(&epoch);
+
+    return (timeinfo.tm_isdst == 1);
 }

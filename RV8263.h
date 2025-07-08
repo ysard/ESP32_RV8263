@@ -279,7 +279,18 @@ public:
      */
     char * getFormattedDateTime();
 
+    /**
+     * @brief Check if the given date is concerned by the Daylight Saving Time
+     * @param dow Day of week (0 is sunday)
+     * @return True if it's summer time
+     */
     bool isInDLSTime(int day, int month, int dow);
+
+    /**
+     * @brief Get the Daylight Saving Time status of the current time
+     * @return True if it's summer time
+     */
+    bool isInDLSTime();
 
     esp_err_t writeYearToRTC(uint16_t);
     esp_err_t readYearFromRTC(uint16_t *);
