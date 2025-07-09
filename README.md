@@ -13,7 +13,7 @@ Read the Application Manual of Micro Crystal Switzerland!
 
 - The library was extracted from its original project.
 - Functions and codes no longer required are removed.
-- Still thread safe but using the i2c manager project to centralize i2c configuration
+- Still thread safe but using the ([i2c manager project](https://github.com/ropg/i2c_manager))to centralize the i2c configuration & usage.
 - Alarms, counters, pulse generation are added.
 
 ## Caution
@@ -56,8 +56,8 @@ void init_rtc() {
 * @brief Set the given epoch to the RTC memory
 * @warning Should be used only 1 time (during the configuration phase)
 * @note A reset is initiated with the software reset command.
-* It must be done when power is stable (if initial startup VDD is not 0).
-* Two communication tries are made; a reset is made before each try.
+*  It must be done when power is stable (if initial startup VDD is not 0).
+*  Two communication tries are made; a reset is made before each try.
 */
 esp_err_t configure_rtc_first_boot(unsigned long epoch) {
     esp_err_t ret;
