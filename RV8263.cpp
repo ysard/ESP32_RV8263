@@ -695,7 +695,7 @@ char * RV8263::getFormattedDateTime() {
 }
 
 
-bool RV8263::isInDLSTime(int day, int month, int dow) {
+bool RV8263::isInDSTime(int day, int month, int dow) {
     if ((month < 3) || (month > 10)) {
         return false;
     }
@@ -717,7 +717,7 @@ bool RV8263::isInDLSTime(int day, int month, int dow) {
 }
 
 
-bool RV8263::isInDLSTime() {
+bool RV8263::isInDSTime() {
     time_t epoch = this->getEpoch();
     struct tm timeinfo = *localtime(&epoch);
 
