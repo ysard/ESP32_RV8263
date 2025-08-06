@@ -236,12 +236,14 @@ public:
 
     /**
      * @brief Get the UNIX timestamp
+     * @param[out] epoch UNIX timestamp
+     * @param[in] updateRequired Set to True to directly interrogate the chip
      * @warning The local time displayed is an offset of the display
      *  and not an offset of the Unix time on the Unix machine.
      *  Thus the timestamp IS NOT and SHOULD NOT be influenced by
      *  any timezone.
      */
-    time_t getEpoch(void);
+    esp_err_t getEpoch(time_t *epoch, bool updateRequired=true);
 
     /**
      * @brief Set the time to the RTC
@@ -268,14 +270,16 @@ public:
      * @param[in]  formatter Date formatter used by `strftime`
      * @param[out] buffer    Buffer in which the date string will be writen
      * @param[in]  len       Size of the given buffer
+     * @param[in]  updateRequired Set to True to directly interrogate the chip
      * @return ESP_ERR_NO_MEM if the buffer was too small
      */
-    esp_err_t getFormattedDateTime(const char *formatter, char *buffer, size_t len);
+    esp_err_t getFormattedDateTime(const char *formatter, char *buffer, size_t len, bool updateRequired=true);
 
     /**
      * @brief Get the date in the YYYYMMDD_HHMMSS format
+     * @param[in] updateRequired Set to True to directly interrogate the chip
      */
-    char * getFormattedDateTime();
+    char * getFormattedDateTime(bool updateRequired=true);
 
     /**
      * @brief Check if the given date is concerned by the Daylight Saving Time
@@ -286,9 +290,10 @@ public:
 
     /**
      * @brief Get the Daylight Saving Time status of the current time
+     * @param[in] updateRequired Set to True to directly interrogate the chip
      * @return True if it's summer time
      */
-    bool isInDSTime();
+    bool isInDSTime(bool updateRequired=true);
 
     esp_err_t writeYearToRTC(uint16_t);
     esp_err_t readYearFromRTC(uint16_t *);
@@ -310,7 +315,7 @@ public:
      * @param[out] bReturn        True if the interrupt was triggered
      * @param[in]  updateRequired Set to True to directly interrogate the chip
      */
-    esp_err_t isTimerWakeUp(bool *bReturn, bool updateRequired = true); // TF
+    esp_err_t isTimerWakeUp(bool *bReturn, bool updateRequired=true); // TF
 
     /**
      * @brief Clear the TF flag associated to the MI, HMI, countdown counters
@@ -405,7 +410,7 @@ public:
      * @param[out] bReturn        True if the interrupt was triggered
      * @param[in]  updateRequired Set to True to directly interrogate the chip
      */
-    esp_err_t isAlarmWakeUp(bool *bReturn, bool updateRequired = true); // AF
+    esp_err_t isAlarmWakeUp(bool *bReturn, bool updateRequired=true); // AF
 
     /**
      * @brief Clear the AF flag associated to the alarms

@@ -100,8 +100,9 @@ extern "C" void app_main() {
     // Set a timezone which was not selected at compilation time
     // Ex: Europe/London
     rtc->setTimezone("GMT0BST,M3.5.0/1,M10.5.0");
-    // Get the UTC timestamp
-    ESP_LOGI(TAG, "UTC epoch: %lu", rtc->getEpoch());
+    // Get the UTC timestamp (should be equal)
+    rtc->getEpoch(&epoch);
+    ESP_LOGI(TAG, "UTC epoch: %lu", epoch);
 
     // Get date in YYYYMMDD_HHMMSS format
     char *datetime_str = rtc->getFormattedDateTime();

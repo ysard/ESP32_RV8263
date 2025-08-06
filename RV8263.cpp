@@ -533,12 +533,20 @@ esp_err_t RV8263::readHoursFromRTC(uint8_t *phours) {
 }
 
 
-time_t RV8263::getEpoch(void) {
+esp_err_t RV8263::getEpoch(time_t *epoch, bool updateRequired) {
     struct tm timeinfo;
 
     // Get UTC time from the chip
     setenv("TZ", "UTC0", 1);
     tzset();
+
+    if (updateRequired) {
+        esp_err_t ret = this->readAllRegsFromRTC();
+        if (ret != ESP_OK) {
+            ESP_LOGE(TAG, "Read registers failed");
+            return ret;
+        }
+    }
 
     // This is year-1900, so RTC store from 2000
     // According to https://en.cppreference.com/w/cpp/chrono/c/mktime subtract is required
@@ -554,7 +562,7 @@ time_t RV8263::getEpoch(void) {
     // DST will be set during the timezone conversion in another function
     timeinfo.tm_isdst = -1;
 
-    time_t epoch = mktime(&timeinfo);
+    *epoch = mktime(&timeinfo);
 
     // Apply the current timezone
     setenv("TZ", this->timezone, 1);
@@ -562,11 +570,11 @@ time_t RV8263::getEpoch(void) {
 
     if (_ESP_LOG_ENABLED(ESP_LOG_INFO)) {
         char strftime_buf[64];
-        timeinfo = *localtime(&epoch);
+        timeinfo = *localtime(epoch);
         strftime(strftime_buf, sizeof(strftime_buf), "%c %Z", &timeinfo);
         ESP_LOGI(TAG, "Get UTC time: %s", strftime_buf);
     }
-    return epoch;
+    return ESP_OK;
 }
 
 
@@ -645,18 +653,20 @@ esp_err_t RV8263::writeRAMToRTC(uint8_t data) {
 esp_err_t RV8263::printAllRegs(bool updateRequired) {
     esp_err_t ret;
 
-    if (updateRequired == true) {
+    if (updateRequired) {
         ret = this->RV8263::readAllRegsFromRTC();
-    } else {
-        ret = ESP_OK;
+        if (ret != ESP_OK) {
+            return ret;
+        }
     }
+
     ESP_LOGI(TAG, "Data Content :");
     uint8_t *p = (uint8_t *)(&(this->sttime));
     for (uint8_t i = 0; i < (sizeof(_ttime) / sizeof(uint8_t)); i++)
     {
         ESP_LOGI(TAG, "0x%02X : %02X\n", i, *(p + i));
     }
-    return ret;
+    return ESP_OK;
 }
 
 
@@ -675,8 +685,10 @@ uint8_t RV8263::bcdToInt(uint8_t bcd) {
 }
 
 
-esp_err_t RV8263::getFormattedDateTime(const char *formatter, char *buffer, size_t len) {
-    time_t epoch = this->getEpoch();
+esp_err_t RV8263::getFormattedDateTime(const char *formatter, char *buffer, size_t len, bool updateRequired) {
+    time_t epoch;
+
+    this->getEpoch(&epoch, updateRequired);
     struct tm timeinfo = *localtime(&epoch);
 
     if (strftime(buffer, len, formatter, &timeinfo) == 0) {
@@ -687,10 +699,10 @@ esp_err_t RV8263::getFormattedDateTime(const char *formatter, char *buffer, size
 }
 
 
-char * RV8263::getFormattedDateTime() {
+char * RV8263::getFormattedDateTime(bool updateRequired) {
     static char buffer[16]; // Max of YYYYMMDD_HHMMSS with \0 terminator
 
-    this->getFormattedDateTime("%Y%m%d_%H%M%S", buffer, sizeof(buffer));
+    this->getFormattedDateTime("%Y%m%d_%H%M%S", buffer, sizeof(buffer), updateRequired);
     return buffer;
 }
 
@@ -717,8 +729,10 @@ bool RV8263::isInDSTime(int day, int month, int dow) {
 }
 
 
-bool RV8263::isInDSTime() {
-    time_t epoch = this->getEpoch();
+bool RV8263::isInDSTime(bool updateRequired) {
+    time_t epoch;
+
+    this->getEpoch(&epoch, updateRequired);
     struct tm timeinfo = *localtime(&epoch);
 
     return (timeinfo.tm_isdst == 1);
