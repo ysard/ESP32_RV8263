@@ -188,8 +188,6 @@ typedef struct  __attribute__ ((packed))
     }
 } _ttime;
 
-// Typedef for the function pointers --> seems both the read and write use the similar definition...
-// typedef esp_err_t (*fncPntr)(i2c_port_t, uint8_t, uint8_t, uint8_t *, size_t );
 
 // Typedef for i2c_manager funcs
 typedef esp_err_t (*fncPntr)(i2c_port_t, uint16_t, uint32_t, uint8_t *, uint16_t);
