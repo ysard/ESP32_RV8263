@@ -68,7 +68,7 @@ esp_err_t RV8263::isOscillatorRunning(bool *oscillator_not_working) {
     *oscillator_not_working = true;
 
     // Stable oscillation is obtained in the range of 200ms to 2s max
-    uint32_t timeout = esp_timer_get_time() + 2500;
+    uint32_t timeout = esp_timer_get_time() + 2500000;
     do
     {
         ret = this->_fp_readi2c(I2C_MASTER_NUM, ADDRESS_RTC, REG_ADDR_SECS, &reg, 1);
