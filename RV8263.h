@@ -28,7 +28,7 @@
 #include <esp_log.h>
 #include "esp_err.h"
 #include "esp_timer.h"
-// Only here to get the I2C_NUM_0 and I2C_NUM_1 defines.
+// Only here to get the I2C_NUM_0 and I2C_NUM_1 defines & i2c_port_t.
 #include <driver/i2c.h>
 // I2C Manager driver
 #include <i2c_manager.h>
