@@ -1,4 +1,20 @@
 {
-  "name": "RV8263",
-  "version": "1.0.0+20250630234923"
+  "name": "ESP32-RV8263",
+  "version": "1.0.0+20250630234923",
+  "description": "An ESP-IDF/PlatformIO library for the real time clock RV-8263-C7.",
+  "keywords": "rtc, rv8263, rv-8263-c7, rv8263c7",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/ysard/ESP32_RV8263"
+  },
+  "authors":
+  [
+    {
+      "name": "Ysard"
+    }
+  ],
+  "license": "MIT",
+  "frameworks": ["arduino", "espidf"],
+  "platforms": ["espressif32"]
 }
