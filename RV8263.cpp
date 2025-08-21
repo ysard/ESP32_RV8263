@@ -596,6 +596,10 @@ esp_err_t RV8263::writeTimeFromEpochToRTC(const time_t epoch) {
         strftime(strftime_buf, sizeof(strftime_buf), "%c %Z", &timeinfo);
         ESP_LOGI(TAG, "Get UTC time: %s", strftime_buf);
     }
+    if ((timeinfo.tm_year + EPOCH_YEAR) < 2000) {
+        ESP_LOGI(TAG, "The RTC only authorises years from 2000 onwards; got: %d", timeinfo.tm_year + EPOCH_YEAR);
+        return ESP_ERR_INVALID_ARG;
+    }
 
     // Note: tm_year stores 125 for 2025, we need 25
     // So... 125 + 1900 - 2000 = 25
