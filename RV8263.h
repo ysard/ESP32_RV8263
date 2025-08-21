@@ -211,10 +211,10 @@ public:
     /**
      * @brief Test the clock integrity
      * If the oscillator is not working, a reset should be made.
-     * @param[out] oscillator_not_working True if the oscillator is not working
      * @note ~5 tests are made in the 2.5s allowed
+     * @return ESP_ERR_INVALID_STATE if the oscillator is not working.
      */
-    esp_err_t isOscillatorRunning(bool *oscillator_not_working);
+    esp_err_t isOscillatorRunning();
 
     /**
      * @brief Sync the internal structure with the RTC chip
@@ -230,7 +230,6 @@ public:
      *  has stopped due to power supply instability.
      */
     esp_err_t resetRTC(void);
-
 
     /**
      * @brief Get the UNIX timestamp

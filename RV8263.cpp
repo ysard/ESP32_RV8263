@@ -60,13 +60,13 @@ void RV8263::setTimezone(const char* newTimezone) {
  * @brief Test the clock integrity
  * If the oscillator is not working, a reset should be made.
  * @note ~5 tests are made in the 2.5s allowed
+ * @return ESP_ERR_INVALID_STATE if the oscillator is not working.
  */
-esp_err_t RV8263::isOscillatorRunning(bool *oscillator_not_working) {
+esp_err_t RV8263::isOscillatorRunning() {
     esp_err_t ret;
     uint8_t   reg = FLAG_SECONDS_OS; // See if the flag is removed
     bool      l_oscillator_not_working = true;
-
-    *oscillator_not_working = false;
+    bool      oscillator_not_working   = false;
 
     // Stable oscillation is obtained in the range of 200ms to 2s max
     uint32_t timeout = esp_timer_get_time() + 2500000;
@@ -76,7 +76,7 @@ esp_err_t RV8263::isOscillatorRunning(bool *oscillator_not_working) {
         // true if the flag is set
         l_oscillator_not_working = ((reg & FLAG_SECONDS_OS) == FLAG_SECONDS_OS);
         // Keep previous bad states: A failure is definitive
-        *oscillator_not_working |= l_oscillator_not_working;
+        oscillator_not_working |= l_oscillator_not_working;
         if (!l_oscillator_not_working) {
             // Everything is OK
             break;
@@ -92,10 +92,10 @@ esp_err_t RV8263::isOscillatorRunning(bool *oscillator_not_working) {
         }
         vTaskDelay(pdMS_TO_TICKS(220));
 
-    } while (esp_timer_get_time() < timeout && (ret != ESP_OK || *oscillator_not_working));
+    } while (esp_timer_get_time() < timeout && (ret != ESP_OK || oscillator_not_working));
 
     if (ret == ESP_OK) {
-        if (*oscillator_not_working) {
+        if (oscillator_not_working) {
             ESP_LOGE(TAG, "Oscillator is not working! Need a reset!");
             return ESP_ERR_INVALID_STATE;
         } else {
