@@ -1,0 +1,8 @@
+version: "1.0.0"
+license: "MIT"
+description: An ESP-IDF/PlatformIO library for the real time clock RV-8263-C7.
+url: https://github.com/ysard/ESP32_RV8263
+dependencies:
+  idf: ">=5.0"
+files:
+  use_gitignore: true
