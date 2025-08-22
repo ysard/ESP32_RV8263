@@ -4,5 +4,7 @@ description: An ESP-IDF/PlatformIO library for the real time clock RV-8263-C7.
 url: https://github.com/ysard/ESP32_RV8263
 dependencies:
   idf: ">=5.0"
+  i2c_manager:
+    git: "https://github.com/ysard/i2c_manager"
 files:
   use_gitignore: true
