@@ -1,6 +1,6 @@
 {
   "name": "ESP32-RV8263",
-  "version": "1.0.0+20250630234923",
+  "version": "1.0.0",
   "description": "An ESP-IDF/PlatformIO library for the real time clock RV-8263-C7.",
   "keywords": "rtc, rv8263, rv-8263-c7, rv8263c7",
   "repository":
