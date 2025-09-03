@@ -171,15 +171,11 @@ esp_err_t RV8263::clearAlarmWakeUp() {
 
 
 esp_err_t RV8263::setAlarmInterrupt(bool enable) { // AIE
-    esp_err_t ret;
-
     return this->setBit(REG_ADDR_CONTROL2, FLAG_CONTROL2_AIE, enable);
 }
 
 
 esp_err_t RV8263::setCountdownInterrupt(bool enable) { // TIE
-    esp_err_t ret;
-
     return this->setBit(REG_ADDR_TIMER_MODE, FLAG_TIMER_MODE_TIE, enable);
 }
 
@@ -275,15 +271,11 @@ esp_err_t RV8263::resetAlarms() {
 
 
 esp_err_t RV8263::setCountdownCounter(bool enable) {
-    esp_err_t ret;
-
     return this->setBit(REG_ADDR_TIMER_MODE, FLAG_TIMER_MODE_TE, enable);
 }
 
 
 esp_err_t RV8263::setPulseGeneration(bool enable) {
-    esp_err_t ret;
-
     return this->setBit(REG_ADDR_TIMER_MODE, FLAG_TIMER_MODE_TI_TP, enable);
 }
 
