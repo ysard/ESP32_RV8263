@@ -35,14 +35,14 @@ static const char *TAG = "RV8263";
 RV8263::RV8263(fncPntr preadI2CFnc, fncPntrConst pwriteI2CFnc) {
     this->_fp_readi2c  = preadI2CFnc;
     this->_fp_writei2c = pwriteI2CFnc;
-    this->timezone = TIME_ZONE;
+    this->setTimezone(TIME_ZONE);
 }
 
 
 RV8263::RV8263() {
     this->_fp_readi2c  = &i2c_manager_read;
     this->_fp_writei2c = &i2c_manager_write;
-    this->timezone = TIME_ZONE;
+    this->setTimezone(TIME_ZONE);
 }
 
 
@@ -52,7 +52,13 @@ const char* RV8263::getTimezone() const {
 
 
 void RV8263::setTimezone(const char* newTimezone) {
-    this->timezone = newTimezone;
+    if (newTimezone) {
+        // Secured copy
+        std::strncpy(timezone, newTimezone, TZ_MAX_LEN - 1);
+        timezone[TZ_MAX_LEN - 1] = '\0';
+    } else {
+        timezone[0] = '\0'; // if null value is given
+    }
 }
 
 

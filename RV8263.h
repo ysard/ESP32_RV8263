@@ -201,7 +201,8 @@ private:
 
     fncPntrConst _fp_writei2c = nullptr;
     fncPntr _fp_readi2c       = nullptr;
-    const char *timezone      = nullptr;
+    static constexpr size_t TZ_MAX_LEN = 64; // max size for the POSIX TZ string
+    char timezone[TZ_MAX_LEN];
     _ttime sttime             = {};
 
 public:
@@ -253,14 +254,14 @@ public:
      * @brief Get the current timezone in POSIX format
      * @see `setTimezone`
      */
-    const char * getTimezone() const;
+    const char* getTimezone() const;
 
     /**
      * @brief Set the current timezone in POSIX format
      * @param[in] newTimezone Timezone in POSIX format
      * @see `getTimezone`
      */
-    void setTimezone(const char *newTimezone);
+    void setTimezone(const char* newTimezone);
 
     /**
      * @brief Get a formatted date
