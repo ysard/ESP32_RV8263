@@ -59,6 +59,10 @@ void RV8263::setTimezone(const char* newTimezone) {
     } else {
         timezone[0] = '\0'; // if null value is given
     }
+
+    // Apply the current timezone
+    setenv("TZ", this->timezone, 1);
+    tzset();
 }
 
 

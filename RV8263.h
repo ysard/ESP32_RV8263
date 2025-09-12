@@ -257,7 +257,7 @@ public:
     const char* getTimezone() const;
 
     /**
-     * @brief Set the current timezone in POSIX format
+     * @brief Set & apply the current timezone in POSIX format
      * @param[in] newTimezone Timezone in POSIX format
      * @see `getTimezone`
      */
