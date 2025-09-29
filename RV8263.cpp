@@ -56,6 +56,8 @@ void RV8263::setTimezone(const char* newTimezone) {
         // Secured copy
         std::strncpy(timezone, newTimezone, TZ_MAX_LEN - 1);
         timezone[TZ_MAX_LEN - 1] = '\0';
+        if (strlen(newTimezone) >= TZ_MAX_LEN)
+            ESP_LOGE(TAG, "TZ has been truncated");
     } else {
         timezone[0] = '\0'; // if null value is given
     }

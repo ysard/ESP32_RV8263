@@ -259,6 +259,7 @@ public:
     /**
      * @brief Set & apply the current timezone in POSIX format
      * @param[in] newTimezone Timezone in POSIX format
+     * @warning @ref newTimezone will be truncated to the first TZ_MAX_LEN chars.
      * @see `getTimezone`
      */
     void setTimezone(const char* newTimezone);
