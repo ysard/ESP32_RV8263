@@ -263,7 +263,7 @@ public:
      * @warning @ref newTimezone will be truncated to the first TZ_MAX_LEN chars.
      * @see `getTimezone`
      */
-    void setTimezone(const char* newTimezone);
+    void setTimezone(const char *newTimezone);
 
     /**
      * @brief Get a formatted date

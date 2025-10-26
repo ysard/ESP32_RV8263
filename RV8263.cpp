@@ -58,7 +58,7 @@ const char* RV8263::getTimezone() const {
 }
 
 
-void RV8263::setTimezone(const char* newTimezone) {
+void RV8263::setTimezone(const char *newTimezone) {
     if (newTimezone) {
         // Secured copy
         std::strncpy(timezone, newTimezone, TZ_MAX_LEN - 1);
