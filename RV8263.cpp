@@ -46,6 +46,13 @@ RV8263::RV8263() {
 }
 
 
+RV8263::RV8263(const char *newTimezone) {
+    this->_fp_readi2c  = &i2c_manager_read;
+    this->_fp_writei2c = &i2c_manager_write;
+    this->setTimezone(newTimezone);
+}
+
+
 const char* RV8263::getTimezone() const {
     return this->timezone;
 }

@@ -208,6 +208,7 @@ private:
 public:
     RV8263(fncPntr readI2CFnc, fncPntrConst writeI2CFnc);
     RV8263();
+    RV8263(const char *newTimezone);
 
     /**
      * @brief Test the clock integrity
