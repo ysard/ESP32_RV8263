@@ -549,7 +549,7 @@ esp_err_t RV8263::readHoursFromRTC(uint8_t *phours) {
 
 
 esp_err_t RV8263::getEpoch(time_t *epoch, bool updateRequired) {
-    struct tm timeinfo;
+    struct tm timeinfo = {};
 
     // Get UTC time from the chip
     setenv("TZ", "UTC0", 1);
@@ -585,7 +585,7 @@ esp_err_t RV8263::getEpoch(time_t *epoch, bool updateRequired) {
 
     if (_ESP_LOG_ENABLED(ESP_LOG_INFO)) {
         char strftime_buf[64];
-        timeinfo = *localtime(epoch);
+        localtime_r(epoch, &timeinfo);
         strftime(strftime_buf, sizeof(strftime_buf), "%c %Z", &timeinfo);
         ESP_LOGI(TAG, "Get UTC time: %s", strftime_buf);
     }
@@ -600,7 +600,7 @@ esp_err_t RV8263::writeTimeFromEpochToRTC(const time_t epoch) {
     setenv("TZ", "UTC0", 1);
     tzset();
 
-    timeinfo = *localtime(&epoch);
+    localtime_r(&epoch, &timeinfo);
 
     if (_ESP_LOG_ENABLED(ESP_LOG_INFO)) {
         char strftime_buf[64];
@@ -706,9 +706,10 @@ uint8_t RV8263::bcdToInt(uint8_t bcd) {
 
 esp_err_t RV8263::getFormattedDateTime(const char *formatter, char *buffer, size_t len, bool updateRequired) {
     time_t epoch;
+    struct tm timeinfo;
 
     this->getEpoch(&epoch, updateRequired);
-    struct tm timeinfo = *localtime(&epoch);
+    localtime_r(&epoch, &timeinfo);
 
     if (strftime(buffer, len, formatter, &timeinfo) == 0) {
         ESP_LOGE(TAG, "Insufficient buffer size allocation");
@@ -750,9 +751,10 @@ bool RV8263::isInDSTime(int day, int month, int dow) {
 
 bool RV8263::isInDSTime(bool updateRequired) {
     time_t epoch;
+    struct tm timeinfo;
 
     this->getEpoch(&epoch, updateRequired);
-    struct tm timeinfo = *localtime(&epoch);
+    localtime_r(&epoch, &timeinfo);
 
     return (timeinfo.tm_isdst == 1);
 }
